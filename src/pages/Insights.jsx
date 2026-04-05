@@ -7,9 +7,24 @@ import {
 import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2, DollarSign, PieChart as PieIcon, Layers } from 'lucide-react';
 import { formatCurrency, getCategorySpending } from '../utils/formatters';
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 
 export default function Insights() {
   const { transactions } = useFinanceStore();
+  const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => setIsDark(document.documentElement.classList.contains('dark')));
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
+  const chartColors = {
+    text: isDark ? '#94a3b8' : '#64748b',
+    grid: isDark ? '#1e3a5a' : '#f1f5f9',
+    tooltipBg: isDark ? '#1d3b53' : '#ffffff',
+    tooltipText: isDark ? '#fdfffc' : '#0f172a',
+  };
 
   const totalIncome = transactions
     .filter((t) => t.type === 'income')
@@ -40,7 +55,7 @@ export default function Insights() {
       </div>
 
       {/* Analytics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <motion.div whileHover={{ y: -4 }} className="bg-white dark:bg-[#0b253a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm shadow-slate-100 flex items-start gap-4 transition-colors">
           <div className="p-3 rounded-xl bg-primary/5 text-primary border border-primary/20">
             <PieIcon size={24} />
@@ -78,7 +93,7 @@ export default function Insights() {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         {/* Income vs Expenses Bar Chart */}
         <div className="lg:col-span-2 bg-white dark:bg-[#0b253a] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm shadow-slate-100 transition-colors">
           <div className="flex items-center justify-between mb-8">
@@ -90,23 +105,23 @@ export default function Insights() {
           <div className="h-[350px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={monthlyData} margin={{ left: -20 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartColors.grid} />
                 <XAxis 
                   dataKey="month" 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
+                  tick={{ fill: chartColors.text, fontSize: 10, fontWeight: 600 }}
                   dy={10}
                 />
                 <YAxis 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 600 }}
+                  tick={{ fill: chartColors.text, fontSize: 10, fontWeight: 600 }}
                   tickFormatter={(val) => `$${val/1000}k`}
                 />
                 <Tooltip 
-                  cursor={{ fill: '#white', opacity: 0.05 }}
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', background: '#1d3b53', color: '#fff' }}
+                  cursor={{ fill: isDark ? '#ffffff' : '#000000', opacity: 0.05 }}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', background: chartColors.tooltipBg, color: chartColors.tooltipText }}
                   itemStyle={{ fontWeight: 'bold' }}
                 />
                 <Legend verticalAlign="top" align="right" wrapperStyle={{ paddingBottom: '30px', fontSize: '10px', fontWeight: 'black', textTransform: 'uppercase', letterSpacing: '0.1em' }} />

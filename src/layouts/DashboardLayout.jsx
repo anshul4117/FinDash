@@ -12,14 +12,12 @@ function cn(...inputs) {
 
 export default function DashboardLayout() {
   const { isMobile } = useWindowSize();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const location = useLocation();
 
   // Close sidebar on mobile when navigating
   useEffect(() => {
-    if (isMobile) {
-      setIsSidebarOpen(false);
-    }
+    if (isMobile) setIsSidebarOpen(false);
   }, [location.pathname, isMobile]);
 
   // Sync sidebar state with screen size changes
@@ -31,43 +29,32 @@ export default function DashboardLayout() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] dark:bg-[#011627] font-sans selection:bg-primary/20 overflow-x-hidden">
-      {/* Sidebar Overlay (Mobile Drawer Backdrop) */}
+      {/* Mobile Backdrop */}
       {isMobile && isSidebarOpen && (
         <div 
           className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300"
           onClick={() => setIsSidebarOpen(false)}
-        ></div>
+        />
       )}
 
-      {/* Sidebar */}
-      <Sidebar 
-        isOpen={isSidebarOpen} 
-        isMobile={isMobile}
-        toggleSidebar={toggleSidebar} 
-      />
+      <Sidebar isOpen={isSidebarOpen} isMobile={isMobile} toggleSidebar={toggleSidebar} />
 
-      {/* Main Content */}
-      <main 
-        className={cn(
-          "flex flex-col min-h-screen transition-all duration-300 ease-in-out",
-          // On mobile, main content doesn't shift. On desktop, it shifts based on sidebar width.
-          isMobile ? "pl-0" : (isSidebarOpen ? "pl-64" : "pl-20")
-        )}
-      >
+      <main className={cn(
+        "flex flex-col min-h-screen transition-all duration-300 ease-in-out",
+        isMobile ? "pl-0" : (isSidebarOpen ? "pl-64" : "pl-20")
+      )}>
         <Navbar onMenuClick={toggleSidebar} isMobile={isMobile} />
         
-        {/* Page Content */}
         <div className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full animate-fade-in">
           <Outlet />
         </div>
 
-        {/* Footer */}
-        <footer className="py-6 px-8 border-t border-slate-100 dark:border-slate-800 bg-white/40 dark:bg-transparent mt-auto">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+        <footer className="py-4 sm:py-6 px-4 sm:px-8 border-t border-slate-100 dark:border-slate-800 bg-white/40 dark:bg-transparent mt-auto">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
             <span>&copy; 2026 FinDash Analytics</span>
-            <div className="flex items-center gap-6">
-              <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-primary transition-colors">Terms of Service</a>
+            <div className="flex items-center gap-4 sm:gap-6">
+              <a href="#" className="hover:text-primary transition-colors">Privacy</a>
+              <a href="#" className="hover:text-primary transition-colors">Terms</a>
               <a href="#" className="hover:text-primary transition-colors">Support</a>
             </div>
           </div>
