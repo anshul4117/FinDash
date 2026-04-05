@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Insights from './pages/Insights';
 import Login from './pages/Login';
+import NotFound from './pages/NotFound';
 import { useFinanceStore } from './store/useFinanceStore';
 
 const ProtectedRoute = ({ children }) => {
@@ -14,11 +15,19 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated } = useFinanceStore();
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+};
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route 
           path="/" 
           element={
@@ -30,11 +39,12 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="transactions" element={<Transactions />} />
           <Route path="insights" element={<Insights />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
 }
 
 export default App;
+
